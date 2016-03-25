@@ -7,11 +7,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.meetme.tuneablegame.Gapper.GapperController;
+
 public class GameActivity extends AppCompatActivity {
     public static final String ID = "RS Activity";
 
     public static final String MY_AD_UNIT_ID = "1234";
-    GameView mRSView;
+    GameView gameView;
     Button btnRestart;
 
     /** Called when the activity is first created. */
@@ -21,16 +23,18 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        mRSView = (GameView) findViewById(R.id.gameview);
+        gameView = (GameView) findViewById(R.id.gameview);
         btnRestart = (Button) findViewById(R.id.btn_restart);
 
         btnRestart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = getBaseContext().getPackageManager()
-                        .getLaunchIntentForPackage( getBaseContext().getPackageName() );
-                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(i);
+                ((GapperController) gameView.thread.mController).downloadConfig();
+
+//                Intent i = getBaseContext().getPackageManager()
+//                        .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+//                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                startActivity(i);
             }
         });
     }
@@ -39,7 +43,7 @@ public class GameActivity extends AppCompatActivity {
     public void onResume(){
         super.onResume();
         Log.d(ID,"onresume");
-        mRSView.resume();
+        gameView.resume();
         getWindow().setBackgroundDrawable(null);
     }
 
@@ -47,7 +51,7 @@ public class GameActivity extends AppCompatActivity {
     public void onPause(){
         super.onPause();
         Log.d(ID,"onpause");
-        mRSView.pause();
+        gameView.pause();
     }
 
     @Override

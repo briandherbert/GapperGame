@@ -60,7 +60,7 @@ public class GameThread extends Thread {
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
 
-    GameController mController = new GapperController();
+    public GameController mController = new GapperController();
 
     public GameThread(Context context, SurfaceHolder holder) {
         mContext = context;
@@ -266,7 +266,7 @@ public class GameThread extends Thread {
         if (log) {
 
             if (tickTime > 0) {
-                canvas.drawText("fps " + fps, 10, 200, textPaint);
+                canvas.drawText("fps " + fps, 10, 100, textPaint);
             }
 //		canvas.drawText("Dist, delta" + (int)Visual.dist + " " + Visual.deltaDist, 10, 30, paint);
 //		//canvas.drawText("Dist " + Visual.dist, 10, 30, paintStroke);

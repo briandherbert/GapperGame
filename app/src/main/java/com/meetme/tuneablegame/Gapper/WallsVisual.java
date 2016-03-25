@@ -83,7 +83,13 @@ public class WallsVisual extends Visual {
 
         playerSize = context.getResources().getDimensionPixelSize(R.dimen.player_visual_radius) * 2;
 
-        if (config != null) mConfig = config;
+        setConfig(config);
+    }
+
+    public void setConfig(Config config) {
+        if (config == null) return;
+
+        mConfig = config;
 
         // Calc all the size
         wallHeight = playerSize / 2;
@@ -97,11 +103,6 @@ public class WallsVisual extends Visual {
         } catch (Exception e) {
             mPaint.setColor(Color.BLUE);
         }
-//
-//        mPaint.setColor(Color.BLUE);
-//        vertSpace = playerSize * 3;
-//        gapSize = (int) (playerSize * 1.5);
-
     }
 
     @Override

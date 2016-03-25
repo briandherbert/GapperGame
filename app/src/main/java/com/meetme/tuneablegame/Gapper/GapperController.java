@@ -47,12 +47,13 @@ public class GapperController extends GameController implements DuctTapeBackend.
             Log.v(TAG, "speed is " + wallsConfig.msToTravelScreen);
 
             handler.sendEmptyMessage(GapperHandler.MSG_DOWNLOADED_CONFIG);
+
+
             return;
         } catch (Exception e) {
             Log.e(TAG, "Failed to download or parse", e);
+            handler.sendEmptyMessage(GapperHandler.MSG_DOWNLOAD_FAILED);
         }
-
-        handler.sendEmptyMessage(GapperHandler.MSG_DOWNLOAD_FAILED);
     }
 
     @Override
@@ -104,6 +105,10 @@ public class GapperController extends GameController implements DuctTapeBackend.
         lastStateChange = System.currentTimeMillis();
     }
 
+    public void downloadConfig() {
+        DuctTapeBackend.downloadGoogleSpreadsheetData(GOOGLE_DOC_KEY, this);
+    };
+
     class GapperHandler extends Handler {
         public static final int MSG_DOWNLOADED_CONFIG = 1;
         public static final int MSG_DOWNLOAD_FAILED = 2;
@@ -113,6 +118,10 @@ public class GapperController extends GameController implements DuctTapeBackend.
             Log.v(TAG, "Got message " + msg.what);
             switch (msg.what) {
                 case MSG_DOWNLOADED_CONFIG:
+                    if (mWalls != null) {
+                        mWalls.setConfig(wallsConfig);
+                        return;
+                    }
                 case MSG_DOWNLOAD_FAILED:
                     setState(State.loaded);
                     break;
