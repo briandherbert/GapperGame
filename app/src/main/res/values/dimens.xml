@@ -1,5 +1,5 @@
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="player_visual_from_bottom">60dp</dimen>
-    <dimen name="player_visual_radius">20dp</dimen>
+    <dimen name="player_visual_from_bottom">20dp</dimen>
+    <dimen name="player_visual_radius">30dp</dimen>
 </resources>

@@ -20,19 +20,21 @@ public class GapperController extends GameController implements DuctTapeBackend.
 
     Context mContext;
 
+    BackgroundVisual mBgVisual;
     StatusVisual mStatus;
     PlayerVisual mPlayer;
     WallsVisual mWalls;
 
-    static final int STATUS_IDX = 0;
-    static final int PLAYER_IDX = 1;
-    static final int WALLS_IDX = 2;
+    static final int BG_IDX = 0;
+    static final int STATUS_IDX = 1;
+    static final int PLAYER_IDX = 2;
+    static final int WALLS_IDX = 3;
 
     Visual[] mVisuals = new Visual[MAX_VISUALS];
 
     GapperHandler handler = new GapperHandler();
 
-    WallsVisual.Config wallsConfig = new WallsVisual.Config();
+    Config mConfig = Config.get();
 
     @Override
     public void onSpreadsheetDataLoaded(String csv) {
@@ -42,12 +44,11 @@ public class GapperController extends GameController implements DuctTapeBackend.
 
             final String[][] rowsCols = DuctTapeBackend.parseCsvToRowColData(csv);
 
-            wallsConfig = WallsVisual.Config.parse(rowsCols);
+            mConfig = Config.parse(rowsCols, mContext);
 
-            Log.v(TAG, "speed is " + wallsConfig.msToTravelScreen);
+            Log.v(TAG, "speed is " + mConfig.msToTravelScreen);
 
             handler.sendEmptyMessage(GapperHandler.MSG_DOWNLOADED_CONFIG);
-
 
             return;
         } catch (Exception e) {
@@ -74,13 +75,17 @@ public class GapperController extends GameController implements DuctTapeBackend.
 
     @Override
     public void init(Context context) {
-        mStatus = new StatusVisual();
-
-        mPlayer = new PlayerVisual(context);
-
-        mVisuals[STATUS_IDX] = mStatus;
-
         mContext = context;
+
+        mBgVisual = new BackgroundVisual(Config.get());
+        mStatus = new StatusVisual();
+        mPlayer = new PlayerVisual(context);
+        mWalls = new WallsVisual(mContext, mConfig);
+
+        mVisuals[BG_IDX] = mBgVisual;
+        mVisuals[STATUS_IDX] = mStatus;
+        mVisuals[PLAYER_IDX] = mPlayer;
+        mVisuals[WALLS_IDX] = mWalls;
 
         setState(State.downloading);
     }
@@ -95,10 +100,7 @@ public class GapperController extends GameController implements DuctTapeBackend.
                 break;
 
             case loaded:
-                mWalls = new WallsVisual(mContext, wallsConfig);
 
-                mVisuals[PLAYER_IDX] = mPlayer;
-                mVisuals[WALLS_IDX] = mWalls;
                 break;
         }
 
@@ -118,10 +120,15 @@ public class GapperController extends GameController implements DuctTapeBackend.
             Log.v(TAG, "Got message " + msg.what);
             switch (msg.what) {
                 case MSG_DOWNLOADED_CONFIG:
-                    if (mWalls != null) {
-                        mWalls.setConfig(wallsConfig);
-                        return;
+                    if (mConfig != null) {
+                        for (Visual visual : mVisuals) {
+                            if (visual != null) visual.setConfig(mConfig);
+                        }
                     }
+
+                    setState(State.loaded);
+
+                    break;
                 case MSG_DOWNLOAD_FAILED:
                     setState(State.loaded);
                     break;
@@ -141,6 +148,8 @@ public class GapperController extends GameController implements DuctTapeBackend.
 
     @Override
     public void onCollision(Visual visual1, int idx1, Visual visual2, int idx2) {
+        if (mPlayer != null && mPlayer.mState == PlayerVisual.State.hit) return;
+
         Class class1 = visual1.getClass();
         Class class2 = visual2.getClass();
 
@@ -155,6 +164,7 @@ public class GapperController extends GameController implements DuctTapeBackend.
 
         if (WallsVisual.class == nonplayer) {
             mPlayer.hitWall();
+            mBgVisual.hitWall();
         } else {
 
         }

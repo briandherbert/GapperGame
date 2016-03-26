@@ -28,7 +28,7 @@ public class StatusVisual extends Visual {
 
     @Override
     public void draw(Canvas canvas) {
-        canvas.drawText("msg", 10, 300, paint);
+        canvas.drawText("msg", 10, 300, mPaint);
     }
 
     @Override

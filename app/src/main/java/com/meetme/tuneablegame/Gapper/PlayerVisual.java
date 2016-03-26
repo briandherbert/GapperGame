@@ -2,6 +2,7 @@ package com.meetme.tuneablegame.Gapper;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -18,6 +19,8 @@ public class PlayerVisual extends Visual {
     public static final String TAG = PlayerVisual.class.getSimpleName();
 
     static final int HIT_DURATION = 500;
+
+    private Bitmap mBmp = null;
 
     enum State {
         normal(Color.GREEN),
@@ -53,14 +56,17 @@ public class PlayerVisual extends Visual {
 
         mBottomPadding = res.getDimensionPixelSize(R.dimen.player_visual_from_bottom);
         mRadius = res.getDimensionPixelSize(R.dimen.player_visual_radius);
-        y = (int) mScreenHeight - (mBottomPadding + mRadius);
 
-        Log.v(TAG, "y is " + y);
+        setConfig(Config.get());
     }
 
     @Override
     public void draw(Canvas canvas) {
-        canvas.drawCircle(x, y, mRadius, mPaint);
+        if (mBmp != null) {
+            canvas.drawBitmap(mBmp, x - mRadius, y - mRadius, mPaint);
+        } else {
+            canvas.drawCircle(x, y, mRadius, mPaint);
+        }
     }
 
     public void onMove(int action, float x, float y) {
@@ -111,5 +117,23 @@ public class PlayerVisual extends Visual {
 
     public void hitWall() {
         setState(State.hit);
+    }
+
+    @Override
+    public void setConfig(Config config) {
+        switch (config.mode) {
+            case ascend:
+                y = (int) mScreenHeight - (mBottomPadding + mRadius);
+
+                break;
+
+            case descend:
+                y = (int) mBottomPadding + mRadius;
+
+                break;
+        }
+
+        mBmp = config.playerBitmap;
+        Log.v(TAG, "y is " + y);
     }
 }

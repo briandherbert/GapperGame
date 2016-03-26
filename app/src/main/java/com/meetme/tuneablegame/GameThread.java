@@ -68,7 +68,7 @@ public class GameThread extends Thread {
 
         textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         textPaint.setTextSize(25);
-        textPaint.setColor(Color.BLACK);
+        textPaint.setColor(Color.GREEN);
         textPaint.setStyle(Paint.Style.FILL);
 
         bgPaint.setColor(Color.WHITE);
@@ -258,7 +258,7 @@ public class GameThread extends Thread {
     public void doDraw() {
         if (canvas == null) return;
 
-        canvas.drawPaint(bgPaint);
+        //canvas.drawPaint(bgPaint);
         for (Visual visual :  mController.getVisuals()) {
             if (visual != null) visual.draw(canvas);
         }
@@ -266,7 +266,7 @@ public class GameThread extends Thread {
         if (log) {
 
             if (tickTime > 0) {
-                canvas.drawText("fps " + fps, 10, 100, textPaint);
+                canvas.drawText("FPS " + fps, 10, 50, textPaint);
             }
 //		canvas.drawText("Dist, delta" + (int)Visual.dist + " " + Visual.deltaDist, 10, 30, paint);
 //		//canvas.drawText("Dist " + Visual.dist, 10, 30, paintStroke);

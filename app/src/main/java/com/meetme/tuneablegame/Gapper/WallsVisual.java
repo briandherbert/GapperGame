@@ -19,7 +19,7 @@ public class WallsVisual extends Visual {
 
     Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-    static int NUM_WALLS = 80;
+    static int NUM_WALLS = 60;
 
     Region[] mNonNullHitRegions = new Region[NUM_WALLS];
     Region[] mReportedHitRegions = new Region[NUM_WALLS];
@@ -35,48 +35,11 @@ public class WallsVisual extends Visual {
     int vertSpace;
     int gapSize;
 
-    public static class Config {
-        public static final int COL_SPEED = 0;
-        public static final int COL_VERT_SPACE = 1;
-        public static final int COL_GAP = 2;
-        public static final int COL_COLOR = 3;
-
-        public long msToTravelScreen = 2000;
-        public double vertSpacePlayerPct = 100;
-        public double gapPlayerPct = 100;
-        String color = "#0000FF";
-
-        public static Config parse(String[][] rowsCols) {
-            Config config = new Config();
-
-            try {
-                config.msToTravelScreen = Integer.valueOf(rowsCols[1][WallsVisual.Config.COL_SPEED]);
-                config.vertSpacePlayerPct = Integer.valueOf(rowsCols[1][WallsVisual.Config.COL_VERT_SPACE]);
-                config.gapPlayerPct = Integer.valueOf(rowsCols[1][WallsVisual.Config.COL_GAP]);
-                config.color = rowsCols[1][Config.COL_COLOR];
-            } catch (Exception e) {
-
-            }
-
-            Log.v(TAG, "Parsed " + config.toString());
-            return config;
-        }
-
-        public String toString() {
-            return "Config\n"
-                    + " msToTravelScreen: " + msToTravelScreen + "\n"
-                    + " vertSpacePlayerPct: " + vertSpacePlayerPct + "\n"
-                    + " gapPlayerPct: " + gapPlayerPct + "\n"
-                    + " color: " + color + "\n";
-        }
-    }
+    Config.Mode mMode = Config.Mode.ascend;
 
     Config mConfig = new Config();
 
-
     public WallsVisual(Context context, Config config) {
-        mWalls[0] = new Rect((int) screenCenterX, 0, (int) screenCenterX + 20, (int) mScreenHeight);
-
         for (int i = 0; i < mWalls.length; i++) {
             mNonNullHitRegions[i] = new Region();
         }
@@ -86,6 +49,7 @@ public class WallsVisual extends Visual {
         setConfig(config);
     }
 
+    @Override
     public void setConfig(Config config) {
         if (config == null) return;
 
@@ -98,11 +62,9 @@ public class WallsVisual extends Visual {
         mPaint.setColor(Color.BLUE);
         pxPerMs = mScreenHeight / mConfig.msToTravelScreen;
 
-        try {
-            mPaint.setColor(Color.parseColor(config.color));
-        } catch (Exception e) {
-            mPaint.setColor(Color.BLUE);
-        }
+        mPaint.setColor(config.wallColor);
+
+        mMode = config.mode;
     }
 
     @Override
@@ -121,48 +83,94 @@ public class WallsVisual extends Visual {
     public void onTick() {
         double dist = deltaTime * pxPerMs;
 
-        int highestY = (int) mScreenHeight;
+        if (Config.Mode.ascend == mMode) {
+            int highestY = (int) mScreenHeight;
 
-        for (int i = 0; i < mWalls.length; i++) {
-            if (mWalls[i] != null) {
-                mWalls[i].top += dist;
-                mWalls[i].bottom += dist;
+            for (int i = 0; i < mWalls.length; i++) {
+                if (mWalls[i] != null) {
+                    mWalls[i].top += dist;
+                    mWalls[i].bottom += dist;
 
-                if (mWalls[i].top < highestY) {
-                    highestY = mWalls[i].top;
-                }
+                    if (mWalls[i].top < highestY) {
+                        highestY = mWalls[i].top;
+                    }
 
-                if (mWalls[i].top > mScreenHeight) {
-                    // Off screen, clear out
+                    if (mWalls[i].top > mScreenHeight) {
+                        // Off screen, clear out
 
-                    mWalls[i] = null;
-                    mReportedHitRegions[i] = null;
+                        mWalls[i] = null;
+                        mReportedHitRegions[i] = null;
+                    } else {
+                        mNonNullHitRegions[i].set(mWalls[i]);
+                        mReportedHitRegions[i] = mNonNullHitRegions[i];
+                    }
                 } else {
-                    mNonNullHitRegions[i].set(mWalls[i]);
-                    mReportedHitRegions[i] = mNonNullHitRegions[i];
+                    mReportedHitRegions[i] = null;
                 }
-            } else {
-                mReportedHitRegions[i] = null;
-            }
-        }
-
-        if (highestY > vertSpace) {
-            // Make a new gap
-
-            int i = 0;
-            while (mReportedHitRegions[i] != null) {
-                i++;
             }
 
-            int j = i+1;
-            while (mReportedHitRegions[i] != null) {
-                j++;
+            if (highestY > vertSpace) {
+                // Make a new gap
+
+                int i = 0;
+                while (mReportedHitRegions[i] != null) {
+                    i++;
+                }
+
+                int j = i + 1;
+                while (mReportedHitRegions[i] != null) {
+                    j++;
+                }
+
+                int gapStart = rand.nextInt((int) mScreenWidth - gapSize);
+
+                mWalls[i] = new Rect(0, -wallHeight, gapStart, 0);
+                mWalls[j] = new Rect(gapStart + gapSize, -wallHeight, (int) mScreenWidth, 0);
+            }
+        } else if (Config.Mode.descend == mMode) {
+            int lowestY = (int) -1;
+
+            for (int i = 0; i < mWalls.length; i++) {
+                if (mWalls[i] != null) {
+                    mWalls[i].top -= dist;
+                    mWalls[i].bottom -= dist;
+
+                    if (mWalls[i].bottom > lowestY) {
+                        lowestY = mWalls[i].bottom;
+                    }
+
+                    if (mWalls[i].bottom < 0) {
+                        // Off screen, clear out
+
+                        mWalls[i] = null;
+                        mReportedHitRegions[i] = null;
+                    } else {
+                        mNonNullHitRegions[i].set(mWalls[i]);
+                        mReportedHitRegions[i] = mNonNullHitRegions[i];
+                    }
+                } else {
+                    mReportedHitRegions[i] = null;
+                }
             }
 
-            int gapStart = rand.nextInt((int) mScreenWidth - gapSize);
+            if (lowestY < (mScreenHeight - vertSpace)) {
+                // Make a new gap
 
-            mWalls[i] = new Rect(0, -wallHeight, gapStart, 0);
-            mWalls[j] = new Rect(gapStart + gapSize, -wallHeight, (int) mScreenWidth, 0);
+                int i = 0;
+                while (mReportedHitRegions[i] != null) {
+                    i++;
+                }
+
+                int j = i + 1;
+                while (mReportedHitRegions[i] != null) {
+                    j++;
+                }
+
+                int gapStart = rand.nextInt((int) mScreenWidth - gapSize);
+
+                mWalls[i] = new Rect(0, (int) mScreenHeight, gapStart, (int) mScreenHeight + wallHeight);
+                mWalls[j] = new Rect(gapStart + gapSize, (int) mScreenHeight, (int) mScreenWidth, (int) mScreenHeight + wallHeight);
+            }
         }
 
         updateHitboxes();
@@ -178,4 +186,6 @@ public class WallsVisual extends Visual {
             }
         }
     }
+
+
 }

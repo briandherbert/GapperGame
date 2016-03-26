@@ -6,14 +6,12 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.Region;
-import android.graphics.Typeface;
 import android.os.Vibrator;
 import android.util.Log;
+
+import com.meetme.tuneablegame.Gapper.Config;
 
 /*
  * Everything is expressed in feet. The squirrel's wheel is 1 foot in diameter, so we can find px per foot
@@ -43,8 +41,6 @@ public abstract class Visual {
     public static Context mContext;
     public static Rect screenRect;
 
-    public static Paint paint = new Paint();
-
     public static Random rand;
     static Vibrator vib;
 
@@ -63,7 +59,6 @@ public abstract class Visual {
         screenRect = new Rect(0, 0, screenWidth, screenHeight);
 
         vib = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
-        paint.setColor(Color.BLACK);
 
         rand = new Random();
 
@@ -113,6 +108,10 @@ public abstract class Visual {
     public abstract Region[] getHitRegions();
 
     public abstract void onTick();
+
+    public void setConfig(Config config) {
+
+    }
 
     public void setVisibility(boolean uIsVisible) {
         isVisible = uIsVisible;
