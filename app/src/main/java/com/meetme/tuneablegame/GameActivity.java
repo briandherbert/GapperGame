@@ -1,6 +1,5 @@
 package com.meetme.tuneablegame;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,12 +28,7 @@ public class GameActivity extends AppCompatActivity {
         btnRestart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((GapperController) gameView.thread.mController).downloadConfig();
-
-//                Intent i = getBaseContext().getPackageManager()
-//                        .getLaunchIntentForPackage( getBaseContext().getPackageName() );
-//                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                startActivity(i);
+                ((GapperController) gameView.mGameThread.mController).downloadConfig();
             }
         });
     }
@@ -43,7 +37,7 @@ public class GameActivity extends AppCompatActivity {
     public void onResume(){
         super.onResume();
         Log.d(ID,"onresume");
-        gameView.resume();
+        //gameView.resume();
         getWindow().setBackgroundDrawable(null);
     }
 
@@ -51,7 +45,7 @@ public class GameActivity extends AppCompatActivity {
     public void onPause(){
         super.onPause();
         Log.d(ID,"onpause");
-        gameView.pause();
+        //gameView.pause();
     }
 
     @Override

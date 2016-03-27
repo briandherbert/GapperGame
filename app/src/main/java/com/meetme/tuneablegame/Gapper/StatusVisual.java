@@ -37,7 +37,7 @@ public class StatusVisual extends Visual {
     }
 
     @Override
-    public void onTick() {
+    public void onTick(long deltaTime) {
 
     }
 }

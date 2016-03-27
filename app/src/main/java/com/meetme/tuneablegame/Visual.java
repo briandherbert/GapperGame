@@ -29,8 +29,6 @@ public abstract class Visual {
     public static final int SCREEN_BOTTOM_PX = 15;
 
     //tracking movement
-    public static double deltaTimeInSec;
-    public static long deltaTime = 0;
     public static long lastTic;
     public static double dist = 0;
     public static double deltaDist = 0;
@@ -42,7 +40,6 @@ public abstract class Visual {
     public static Rect screenRect;
 
     public static Random rand;
-    static Vibrator vib;
 
     public static BitmapFactory.Options options;
 
@@ -58,8 +55,6 @@ public abstract class Visual {
         screenCenterY = mScreenWidth / 2;
         screenRect = new Rect(0, 0, screenWidth, screenHeight);
 
-        vib = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
-
         rand = new Random();
 
         options = new BitmapFactory.Options();
@@ -70,44 +65,17 @@ public abstract class Visual {
     }
 
     public static void startTimers() {
-        deltaTime = 0;
-        deltaTimeInSec = 0;
         dist = 0;
         deltaDist = 0;
         distInPx = 0;
     }
 
-    public Bitmap initBitmap(int id) {
-        Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), id);
-        //bmp = Bitmap.createScaledBitmap(bmp, (int)(bmp.getWidth()*.25), (int)(bmp.getHeight()*.25), false);
-        return bmp;
-    }
-
-    public Bitmap initBitmap(int id, int width, int height) {
-        if (width <= 0)
-            width = 1;
-        if (height <= 0)
-            height = 1;
-
-        Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), id);
-        //bmp = bmp.copy(Bitmap.Config.ARGB_8888, true);
-        bmp = Bitmap.createScaledBitmap(bmp, width, height, false);
-        return bmp;
-    }
-
-    public Bitmap initBitmapOpaque(int id, int width, int height) {
-        Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), id);
-        bmp = bmp.copy(Bitmap.Config.RGB_565, false);
-        bmp = Bitmap.createScaledBitmap(bmp, width, height, false);
-
-        return bmp;
-    }
 
     public abstract void draw(Canvas canvas);
 
     public abstract Region[] getHitRegions();
 
-    public abstract void onTick();
+    public abstract void onTick(long deltaTime);
 
     public void setConfig(Config config) {
 
@@ -115,10 +83,5 @@ public abstract class Visual {
 
     public void setVisibility(boolean uIsVisible) {
         isVisible = uIsVisible;
-    }
-
-    public static void vibrate(long ms) {
-        if (vib == null) return;
-        vib.vibrate(100);
     }
 }

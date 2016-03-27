@@ -38,7 +38,7 @@ public class DuctTapeBackend {
     /**
      * Used to toggle logging
      */
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     /**
      * Max chars to read from the spreadsheet
@@ -78,8 +78,9 @@ public class DuctTapeBackend {
                                                      DownloadGoogleSpreadsheetDataListener listener) {
         String url = String.format(CSV_URL, key);
 
-        if (DEBUG)
+        if (DEBUG) {
             Log.v(TAG, "Download spreadsheet at " + url);
+        }
 
         Thread thread = new GetSpreadsheetDataThread(url, listener);
         thread.start();
@@ -114,8 +115,9 @@ public class DuctTapeBackend {
     }
 
     private static String getPageSourceAsDesktop(String urlStr, String searchFor) {
-        if (DEBUG)
+        if (DEBUG) {
             Log.v(TAG, "Getting page src for " + urlStr);
+        }
 
         URL url = null;
         String inputLine = "";
@@ -221,8 +223,10 @@ public class DuctTapeBackend {
     }
 
     private static List<String> getColumnsFromRow(String row) {
-        if (DEBUG)
+        if (DEBUG) {
             Log.v(TAG, "Get cols from row " + row);
+        }
+
         int length = row.length();
 
         ArrayList<String> colVals = new ArrayList<String>();
@@ -297,8 +301,9 @@ public class DuctTapeBackend {
             colVals.add("");
         }
 
-        if (DEBUG)
+        if (DEBUG) {
             Log.v(TAG, "Cols " + colVals);
+        }
         return colVals;
     }
 }

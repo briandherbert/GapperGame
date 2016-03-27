@@ -28,8 +28,8 @@ public class Config {
 
     // Walls
     public static long msToTravelScreen = 2000;
-    public static int vertSpacePlayerPct = 100;
-    public static int gapPlayerPct = 100;
+    public static int vertSpacePlayerPct = 300;
+    public static int gapPlayerPct = 300;
     public static int wallColor = Color.BLACK;
     public static Bitmap playerBitmap = null;
 

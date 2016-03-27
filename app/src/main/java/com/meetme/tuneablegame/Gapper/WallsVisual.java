@@ -57,8 +57,8 @@ public class WallsVisual extends Visual {
 
         // Calc all the size
         wallHeight = playerSize / 2;
-        vertSpace = (int) (playerSize * (mConfig.vertSpacePlayerPct) / 100.0);
-        gapSize = (int) (playerSize * (mConfig.gapPlayerPct / 100.0));
+        vertSpace = Math.min((int)mScreenHeight / 2, (int) (playerSize * (mConfig.vertSpacePlayerPct) / 100.0));
+        gapSize = Math.min((int) (mScreenWidth * .8), (int) (playerSize * (mConfig.gapPlayerPct / 100.0)));
         mPaint.setColor(Color.BLUE);
         pxPerMs = mScreenHeight / mConfig.msToTravelScreen;
 
@@ -80,7 +80,7 @@ public class WallsVisual extends Visual {
     }
 
     @Override
-    public void onTick() {
+    public void onTick(long deltaTime) {
         double dist = deltaTime * pxPerMs;
 
         if (Config.Mode.ascend == mMode) {

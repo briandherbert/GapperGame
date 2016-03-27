@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Region;
 import android.util.Log;
 
+import com.meetme.tuneablegame.GameUtils;
 import com.meetme.tuneablegame.R;
 import com.meetme.tuneablegame.Visual;
 
@@ -80,7 +81,7 @@ public class PlayerVisual extends Visual {
     }
 
     @Override
-    public void onTick() {
+    public void onTick(long deltaTime) {
         mTimeSinceStateChange += deltaTime;
 
         switch (mState) {
@@ -103,7 +104,7 @@ public class PlayerVisual extends Visual {
 
         switch (state) {
             case hit:
-                vibrate(100);
+                GameUtils.vibrate(100);
 
                 break;
 

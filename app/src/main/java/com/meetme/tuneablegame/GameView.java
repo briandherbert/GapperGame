@@ -3,23 +3,33 @@ package com.meetme.tuneablegame;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
 
-public class GameView extends SurfaceView implements SurfaceHolder.Callback {
+import com.meetme.tuneablegame.Gapper.GapperController;
 
+public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public static final String TAG = GameView.class.getSimpleName();
 
-    public GameThread thread;
-    Context context;
+    public GameThread mGameThread;
+
+    GameController mController;
+
+    public GameView(Context context) {
+        super(context, null);
+        init();
+    }
 
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        // TODO Auto-generated constructor stub
-        this.context = context;
-        //resume();
+        init();
+    }
+
+    void init() {
+        Log.v(TAG, "init");
+        SurfaceHolder holder = getHolder();
+        holder.addCallback(this);
     }
 
     @Override
@@ -29,35 +39,29 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        Log.v(TAG, "surface created, size ");
+        Log.v(TAG, "surface created, thread null " + (mGameThread == null));
 
-        if (thread == null) {
-            resume();
+        Visual.init(getWidth(), getHeight(), getContext());
+
+        if (mGameThread == null) {
+            mGameThread = new GameThread(getContext(), holder, getController());
         }
 
-        thread.initGraphics(getWidth(), getHeight());
-        thread.setRunning(true);
-        thread.start();
+        GameUtils.init(getContext());
+
+        mGameThread.setRunning(true);
+        mGameThread.start();
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        //thread.setRunning(false);
+        Log.v(TAG, "surfaceDestroyed");
 
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        return thread.onTouch(event);
-    }
-
-    public void pause() {
-        if (thread != null) {
+        if (mGameThread != null) {
             try {
-                thread.setRunning(false);
-                thread.interrupt();
-                thread = null;
+                mGameThread.setRunning(false);
+                mGameThread.interrupt();
+                mGameThread = null;
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -65,9 +69,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
-    public void resume() {
-        SurfaceHolder holder = getHolder();
-        holder.addCallback(this);
-        thread = new GameThread(context, holder);
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        return mGameThread.onTouch(event);
+    }
+
+    public GameController getController() {
+        if (mController == null) mController = new GapperController();
+        return mController;
     }
 }

@@ -142,7 +142,7 @@ public class GapperController extends GameController implements DuctTapeBackend.
     }
 
     @Override
-    public void onMove(int action, float x, float y) {
+    public void onTouch(int action, float x, float y) {
         mPlayer.onMove(action, x, y);
     }
 

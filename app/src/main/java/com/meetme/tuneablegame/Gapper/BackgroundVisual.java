@@ -41,7 +41,7 @@ public class BackgroundVisual extends Visual {
     }
 
     @Override
-    public void onTick() {
+    public void onTick(long deltaTime) {
         mTimeSinceStateChange += deltaTime;
 
         switch (mState) {
